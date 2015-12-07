@@ -7,7 +7,7 @@ from django.contrib.messages.api import MessageFailure
 from django.shortcuts import redirect
 from django.utils.http import urlquote
 
-from social.exceptions import SocialAuthBaseException
+from social.exceptions import SocialAuthBaseException, AuthCanceled
 from social.utils import social_logger
 
 
@@ -32,7 +32,8 @@ class SocialAuthExceptionMiddleware(object):
             backend_name = getattr(backend, 'name', 'unknown-backend')
 
             message = self.get_message(request, exception)
-            social_logger.error(message)
+            if not isinstance(exception, AuthCanceled):
+                social_logger.error(message)
 
             url = self.get_redirect_uri(request, exception)
             try:
